@@ -11,7 +11,50 @@ export type Template = {
   createdAt: string;
 };
 
-const img = (seed: string) => `https://picsum.photos/seed/${seed}/800/560`;
+// Category-appropriate real imagery from Unsplash
+const IMAGES: Record<string, string[]> = {
+  eCommerce: [
+    "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&q=80",
+    "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&q=80",
+    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80",
+    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80",
+    "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80",
+  ],
+  Portfolio: [
+    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",
+    "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80",
+    "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80",
+    "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80",
+    "https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=1200&q=80",
+  ],
+  "Landing Page": [
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
+    "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80",
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+    "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&q=80",
+  ],
+  "Admin Dashboard": [
+    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
+    "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&q=80",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80",
+    "https://images.unsplash.com/photo-1543286386-713bdd548da4?w=1200&q=80",
+  ],
+  Restaurant: [
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80",
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80",
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80",
+    "https://images.unsplash.com/photo-1533777324565-a040eb52facd?w=1200&q=80",
+    "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=1200&q=80",
+  ],
+};
+const pickCounter: Record<string, number> = {};
+const img = (category: keyof typeof IMAGES) => {
+  const list = IMAGES[category];
+  const i = (pickCounter[category] ?? 0) % list.length;
+  pickCounter[category] = i + 1;
+  return list[i];
+};
 
 export const TEMPLATES: Template[] = [
   { id: 1, name: "Nova Commerce", description: "Modern storefront with cart & checkout flow.", thumbnail: img("nova"), price: 39, framework: "Next.js", category: "eCommerce", downloads: 12480, rating: 4.8, createdAt: "2026-06-14" },
