@@ -511,9 +511,9 @@ function TemplateCard({ t }: { t: Template }) {
 
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-2 flex items-center gap-2">
-          <Badge variant="outline" className="text-xs">{t.framework}</Badge>
           <Badge variant="secondary" className="text-xs">{t.category}</Badge>
         </div>
+
         <h3 className="font-display text-base font-bold">{t.name}</h3>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{t.description}</p>
 
