@@ -505,7 +505,7 @@ function TemplateCard({ t }: { t: Template }) {
           </div>
         </div>
         <DialogContent className="max-w-4xl overflow-hidden p-0">
-          <img src={t.thumbnail.replace("/800/560", "/1600/1120")} alt={t.name} className="h-auto w-full" />
+          <img src={t.thumbnail} alt={t.name} className="h-auto w-full" />
         </DialogContent>
       </Dialog>
 
