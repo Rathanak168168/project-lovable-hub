@@ -270,7 +270,6 @@ function Navbar({
                 </div>
               </div>
 
-              </div>
             </SheetContent>
           </Sheet>
         </div>
