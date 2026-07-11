@@ -246,12 +246,6 @@ function Navbar({
               className="pl-9"
             />
           </div>
-          <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => toast("Login coming soon")}>
-            Login
-          </Button>
-          <Button size="sm" className="hidden md:inline-flex" onClick={() => toast("Sign up coming soon")}>
-            Sign up
-          </Button>
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
