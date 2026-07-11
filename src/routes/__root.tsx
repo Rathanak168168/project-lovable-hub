@@ -82,10 +82,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Browse, filter, and download modern coded website templates. React, Next.js, Tailwind, Vue, Bootstrap." },
       { name: "author", content: "WebMarket" },
       { property: "og:title", content: "WebMarket — Premium & Free Website Templates" },
-      { property: "og:description", content: "Browse, filter, and download modern coded website templates." },
+      { property: "og:description", content: "Browse, filter, and download modern coded website templates. React, Next.js, Tailwind, Vue, Bootstrap." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "WebMarket — Premium & Free Website Templates" },
+      { name: "twitter:description", content: "Browse, filter, and download modern coded website templates. React, Next.js, Tailwind, Vue, Bootstrap." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/15b20a39-517d-490f-8bd8-67fb4cf17835/id-preview-2be02516--57b1991b-c27e-4a8b-b23c-4c2fdcfed499.lovable.app-1783764161011.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/15b20a39-517d-490f-8bd8-67fb4cf17835/id-preview-2be02516--57b1991b-c27e-4a8b-b23c-4c2fdcfed499.lovable.app-1783764161011.png" },
     ],
     links: [
       {
