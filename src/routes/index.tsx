@@ -246,12 +246,6 @@ function Navbar({
               className="pl-9"
             />
           </div>
-          <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => toast("Login coming soon")}>
-            Login
-          </Button>
-          <Button size="sm" className="hidden md:inline-flex" onClick={() => toast("Sign up coming soon")}>
-            Sign up
-          </Button>
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
@@ -274,11 +268,8 @@ function Navbar({
                     ))}
                   </div>
                 </div>
-                <div className="grid gap-2">
-                  <Button variant="outline" onClick={() => toast("Login coming soon")}>Login</Button>
-                  <Button onClick={() => toast("Sign up coming soon")}>Sign up</Button>
-                </div>
               </div>
+
             </SheetContent>
           </Sheet>
         </div>
@@ -329,14 +320,13 @@ function Hero({
         }}
       />
       <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 sm:py-28 lg:px-8">
-        <Badge variant="secondary" className="mb-5">24+ curated templates · updated weekly</Badge>
         <h1 className="font-display text-4xl font-bold tracking-tight sm:text-6xl">
-          Find the perfect template for your next project.
+          Find the perfect website template for your business
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
-          Production-ready coded templates for landing pages, dashboards, storefronts, and more —
-          crafted with React, Next.js, Tailwind, Vue, and Bootstrap.
+          Ready-to-use website templates for landing pages, online stores, dashboards, and more — designed to help your business grow faster.
         </p>
+
 
         <form
           onSubmit={(e) => { e.preventDefault(); onSearch(); }}
@@ -515,15 +505,15 @@ function TemplateCard({ t }: { t: Template }) {
           </div>
         </div>
         <DialogContent className="max-w-4xl overflow-hidden p-0">
-          <img src={t.thumbnail.replace("/800/560", "/1600/1120")} alt={t.name} className="h-auto w-full" />
+          <img src={t.thumbnail} alt={t.name} className="h-auto w-full" />
         </DialogContent>
       </Dialog>
 
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-2 flex items-center gap-2">
-          <Badge variant="outline" className="text-xs">{t.framework}</Badge>
           <Badge variant="secondary" className="text-xs">{t.category}</Badge>
         </div>
+
         <h3 className="font-display text-base font-bold">{t.name}</h3>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{t.description}</p>
 
