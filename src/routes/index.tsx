@@ -1,47 +1,62 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Search, Menu, X, Star, Download, ChevronDown, Filter,
-  LayoutGrid, Store, User, Utensils, Rocket, Gauge, Github, Twitter, Linkedin,
+  Search, Menu, Star, Download, ChevronDown, Filter,
+  LayoutGrid, Store, User, Utensils, Building2, GraduationCap, HeartPulse, Plane, Home, Briefcase,
+  ShoppingCart, Package, Clock, School as SchoolIcon, Stethoscope, CalendarCheck, Users, Layers,
+  ExternalLink, Twitter, Github, Linkedin,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { TEMPLATES, type Template } from "@/lib/templates-data";
+import {
+  TEMPLATES, WEBSITE_CATEGORIES, SOLUTION_CATEGORIES, type Template,
+} from "@/lib/templates-data";
 
 export const Route = createFileRoute("/")({ component: Index });
 
-const CATEGORIES = ["eCommerce", "Admin Dashboard", "Portfolio", "Landing Page", "Restaurant"] as const;
-const FRAMEWORKS = ["Bootstrap", "Tailwind", "Next.js", "React", "Vue"] as const;
 const CATEGORY_ICONS: Record<string, typeof Store> = {
-  eCommerce: Store, Portfolio: User, "Landing Page": Rocket,
-  "Admin Dashboard": Gauge, Restaurant: Utensils,
+  "Business Website": Briefcase,
+  "eCommerce": Store,
+  "Restaurant": Utensils,
+  "Hotel": Building2,
+  "School": GraduationCap,
+  "Hospital": HeartPulse,
+  "Travel Agency": Plane,
+  "Real Estate": Home,
+  "Portfolio": User,
+  "POS System": ShoppingCart,
+  "Inventory System": Package,
+  "Attendance System": Clock,
+  "School Management System": SchoolIcon,
+  "Hospital Management System": Stethoscope,
+  "Booking System": CalendarCheck,
+  "CRM": Users,
+  "ERP": Layers,
 };
+
 const PAGE_SIZE = 9;
 
 function Index() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
+  const [kind, setKind] = useState<"all" | "website" | "solution">("all");
   const [price, setPrice] = useState<"all" | "free" | "premium">("all");
-  const [frameworks, setFrameworks] = useState<string[]>([]);
   const [sort, setSort] = useState<"popularity" | "latest" | "downloads">("popularity");
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const catalogRef = useRef<HTMLDivElement>(null);
 
-  // ⌘K focus
   const searchRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -61,29 +76,31 @@ function Index() {
       items = items.filter(t =>
         t.name.toLowerCase().includes(q) ||
         t.description.toLowerCase().includes(q) ||
-        t.category.toLowerCase().includes(q) ||
-        t.framework.toLowerCase().includes(q),
+        t.category.toLowerCase().includes(q),
       );
     }
     if (category) items = items.filter(t => t.category === category);
+    if (kind !== "all") items = items.filter(t => t.kind === kind);
     if (price === "free") items = items.filter(t => t.price === 0);
     if (price === "premium") items = items.filter(t => t.price > 0);
-    if (frameworks.length) items = items.filter(t => frameworks.includes(t.framework));
     if (sort === "latest") items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     else if (sort === "downloads") items.sort((a, b) => b.downloads - a.downloads);
     else items.sort((a, b) => b.rating * 1000 + b.downloads / 1000 - (a.rating * 1000 + a.downloads / 1000));
     return items;
-  }, [query, category, price, frameworks, sort]);
+  }, [query, category, kind, price, sort]);
 
-  useEffect(() => { setPage(1); }, [query, category, price, frameworks, sort]);
+  useEffect(() => { setPage(1); }, [query, category, kind, price, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const scrollToCatalog = () => catalogRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  const toggleFramework = (fw: string) => {
-    setFrameworks(prev => prev.includes(fw) ? prev.filter(f => f !== fw) : [...prev, fw]);
+  const pickCategory = (c: string) => {
+    setCategory(c);
+    const isSolution = (SOLUTION_CATEGORIES as readonly string[]).includes(c);
+    setKind(isSolution ? "solution" : "website");
+    scrollToCatalog();
   };
 
   return (
@@ -93,26 +110,24 @@ function Index() {
         setQuery={setQuery}
         mobileOpen={mobileNavOpen}
         setMobileOpen={setMobileNavOpen}
-        onCategoryPick={(c) => { setCategory(c); scrollToCatalog(); }}
+        onCategoryPick={pickCategory}
       />
 
-      <Hero
-        query={query}
-        setQuery={setQuery}
-        onSearch={scrollToCatalog}
-        searchRef={searchRef}
-      />
+      <Hero query={query} setQuery={setQuery} onSearch={scrollToCatalog} searchRef={searchRef} />
 
-      <CategoryChips active={category} onPick={(c) => { setCategory(c === category ? null : c); scrollToCatalog(); }} />
+      <CategoryChips active={category} onPick={(c) => {
+        if (c === category) { setCategory(null); setKind("all"); scrollToCatalog(); }
+        else pickCategory(c);
+      }} />
 
       <section ref={catalogRef} className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-              {category ?? "All templates"}
+              {category ?? (kind === "solution" ? "Business Solutions" : kind === "website" ? "Websites" : "All templates")}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {filtered.length} template{filtered.length === 1 ? "" : "s"} found
+              {filtered.length} result{filtered.length === 1 ? "" : "s"}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -126,8 +141,8 @@ function Index() {
                 <div className="pt-6">
                   <FiltersPanel
                     price={price} setPrice={setPrice}
-                    frameworks={frameworks} toggleFramework={toggleFramework}
-                    category={category} setCategory={(c) => setCategory(c)}
+                    kind={kind} setKind={setKind}
+                    category={category} setCategory={setCategory}
                   />
                 </div>
               </SheetContent>
@@ -141,7 +156,7 @@ function Index() {
             <div className="sticky top-24 rounded-2xl border bg-card p-5">
               <FiltersPanel
                 price={price} setPrice={setPrice}
-                frameworks={frameworks} toggleFramework={toggleFramework}
+                kind={kind} setKind={setKind}
                 category={category} setCategory={setCategory}
               />
             </div>
@@ -150,10 +165,10 @@ function Index() {
           <div className="min-w-0">
             {pageItems.length === 0 ? (
               <div className="rounded-2xl border border-dashed p-16 text-center">
-                <p className="font-display text-lg font-semibold">No templates match your filters</p>
+                <p className="font-display text-lg font-semibold">No results match your filters</p>
                 <p className="mt-1 text-sm text-muted-foreground">Try clearing a filter or searching for something else.</p>
                 <Button variant="outline" className="mt-4" onClick={() => {
-                  setQuery(""); setCategory(null); setPrice("all"); setFrameworks([]);
+                  setQuery(""); setCategory(null); setKind("all"); setPrice("all");
                 }}>Reset filters</Button>
               </div>
             ) : (
@@ -183,16 +198,16 @@ function Navbar({
   mobileOpen: boolean; setMobileOpen: (v: boolean) => void;
   onCategoryPick: (c: string) => void;
 }) {
-  const [openMenu, setOpenMenu] = useState<null | "websites" | "business">(null);
+  const [openMenu, setOpenMenu] = useState<null | "websites" | "solutions">(null);
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-        <a href="#" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
             <LayoutGrid className="h-4 w-4" />
           </div>
           <span className="font-display text-lg font-bold tracking-tight">WebMarket</span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
           <MegaMenu
@@ -201,7 +216,7 @@ function Navbar({
             onOpenChange={(o) => setOpenMenu(o ? "websites" : null)}
           >
             <div className="grid grid-cols-2 gap-1 p-2">
-              {CATEGORIES.map(c => {
+              {WEBSITE_CATEGORIES.map(c => {
                 const Icon = CATEGORY_ICONS[c];
                 return (
                   <button key={c}
@@ -221,19 +236,29 @@ function Navbar({
           </MegaMenu>
           <MegaMenu
             label="Business Solutions"
-            open={openMenu === "business"}
-            onOpenChange={(o) => setOpenMenu(o ? "business" : null)}
+            open={openMenu === "solutions"}
+            onOpenChange={(o) => setOpenMenu(o ? "solutions" : null)}
           >
             <div className="grid grid-cols-2 gap-1 p-2">
-              {["Enterprise licensing", "Custom development", "Team plans", "White-label", "Priority support", "Design services"].map(l => (
-                <button key={l} onClick={() => { setOpenMenu(null); toast("Coming soon"); }}
-                  className="rounded-lg p-3 text-left text-sm hover:bg-accent">
-                  <div className="font-semibold">{l}</div>
-                  <div className="text-xs text-muted-foreground">Learn more →</div>
-                </button>
-              ))}
+              {SOLUTION_CATEGORIES.map(c => {
+                const Icon = CATEGORY_ICONS[c];
+                return (
+                  <button key={c}
+                    onClick={() => { onCategoryPick(c); setOpenMenu(null); }}
+                    className="flex items-start gap-3 rounded-lg p-3 text-left hover:bg-accent">
+                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold">{c}</div>
+                      <div className="text-xs text-muted-foreground">Ready-to-launch software</div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </MegaMenu>
+          <Link to="/about" className="rounded-md px-3 py-2 text-sm font-medium hover:bg-accent">About</Link>
         </nav>
 
         <div className="ml-auto flex flex-1 items-center justify-end gap-2">
@@ -242,7 +267,7 @@ function Navbar({
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search templates..."
+              placeholder="Search websites & solutions..."
               className="pl-9"
             />
           </div>
@@ -253,23 +278,32 @@ function Navbar({
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-80">
+            <SheetContent side="right" className="w-80 overflow-y-auto">
               <div className="mt-6 space-y-6">
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search templates..." className="pl-9" />
+                  <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search..." className="pl-9" />
                 </div>
                 <div>
                   <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Websites</div>
                   <div className="grid gap-1">
-                    {CATEGORIES.map(c => (
+                    {WEBSITE_CATEGORIES.map(c => (
                       <button key={c} onClick={() => { onCategoryPick(c); setMobileOpen(false); }}
                         className="rounded-md px-3 py-2 text-left text-sm hover:bg-accent">{c}</button>
                     ))}
                   </div>
                 </div>
+                <div>
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Business Solutions</div>
+                  <div className="grid gap-1">
+                    {SOLUTION_CATEGORIES.map(c => (
+                      <button key={c} onClick={() => { onCategoryPick(c); setMobileOpen(false); }}
+                        className="rounded-md px-3 py-2 text-left text-sm hover:bg-accent">{c}</button>
+                    ))}
+                  </div>
+                </div>
+                <Link to="/about" onClick={() => setMobileOpen(false)} className="block rounded-md px-3 py-2 text-sm font-medium hover:bg-accent">About</Link>
               </div>
-
             </SheetContent>
           </Sheet>
         </div>
@@ -293,7 +327,7 @@ function MegaMenu({
         {label} <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-50 w-[520px] pt-2">
+        <div className="absolute left-0 top-full z-50 w-[560px] pt-2">
           <div className="rounded-xl border bg-popover shadow-xl">{children}</div>
         </div>
       )}
@@ -327,7 +361,6 @@ function Hero({
           Ready-to-use website templates for landing pages, online stores, dashboards, and more — designed to help your business grow faster.
         </p>
 
-
         <form
           onSubmit={(e) => { e.preventDefault(); onSearch(); }}
           className="relative mx-auto mt-8 max-w-xl"
@@ -337,7 +370,7 @@ function Hero({
             ref={searchRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search 'admin dashboard', 'restaurant', 'Next.js'..."
+            placeholder="Search 'restaurant', 'hotel', 'POS system'..."
             className="h-14 rounded-full pl-12 pr-24 text-base shadow-sm"
           />
           <kbd className="absolute right-4 top-1/2 hidden -translate-y-1/2 rounded-md border bg-muted px-2 py-1 text-xs font-medium text-muted-foreground sm:inline-block">
@@ -355,7 +388,7 @@ function CategoryChips({ active, onPick }: { active: string | null; onPick: (c: 
   return (
     <div className="border-b bg-muted/30">
       <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 py-4 sm:px-6 lg:px-8">
-        {CATEGORIES.map(c => {
+        {WEBSITE_CATEGORIES.map(c => {
           const Icon = CATEGORY_ICONS[c];
           const isActive = active === c;
           return (
@@ -382,17 +415,33 @@ function CategoryChips({ active, onPick }: { active: string | null; onPick: (c: 
 /* ---------- Filters ---------- */
 
 function FiltersPanel({
-  price, setPrice, frameworks, toggleFramework, category, setCategory,
+  price, setPrice, kind, setKind, category, setCategory,
 }: {
   price: "all" | "free" | "premium";
   setPrice: (v: "all" | "free" | "premium") => void;
-  frameworks: string[];
-  toggleFramework: (fw: string) => void;
+  kind: "all" | "website" | "solution";
+  setKind: (v: "all" | "website" | "solution") => void;
   category: string | null;
   setCategory: (c: string | null) => void;
 }) {
   return (
     <div className="space-y-6">
+      <div>
+        <h3 className="mb-3 font-display text-sm font-bold uppercase tracking-wider">Type</h3>
+        <RadioGroup value={kind} onValueChange={(v) => setKind(v as "all" | "website" | "solution")}>
+          {[
+            { v: "all", l: "All" },
+            { v: "website", l: "Websites" },
+            { v: "solution", l: "Business Solutions" },
+          ].map(o => (
+            <div key={o.v} className="flex items-center gap-2">
+              <RadioGroupItem id={`kind-${o.v}`} value={o.v} />
+              <Label htmlFor={`kind-${o.v}`} className="cursor-pointer text-sm font-normal">{o.l}</Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+
       <div>
         <h3 className="mb-3 font-display text-sm font-bold uppercase tracking-wider">Price</h3>
         <RadioGroup value={price} onValueChange={(v) => setPrice(v as "all" | "free" | "premium")}>
@@ -410,23 +459,7 @@ function FiltersPanel({
       </div>
 
       <div>
-        <h3 className="mb-3 font-display text-sm font-bold uppercase tracking-wider">Framework</h3>
-        <div className="space-y-2">
-          {FRAMEWORKS.map(fw => (
-            <div key={fw} className="flex items-center gap-2">
-              <Checkbox
-                id={`fw-${fw}`}
-                checked={frameworks.includes(fw)}
-                onCheckedChange={() => toggleFramework(fw)}
-              />
-              <Label htmlFor={`fw-${fw}`} className="cursor-pointer text-sm font-normal">{fw}</Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="mb-3 font-display text-sm font-bold uppercase tracking-wider">Category</h3>
+        <h3 className="mb-3 font-display text-sm font-bold uppercase tracking-wider">Websites</h3>
         <div className="space-y-1">
           <button
             onClick={() => setCategory(null)}
@@ -435,7 +468,23 @@ function FiltersPanel({
               category === null && "bg-accent font-semibold",
             )}
           >All categories</button>
-          {CATEGORIES.map(c => (
+          {WEBSITE_CATEGORIES.map(c => (
+            <button
+              key={c}
+              onClick={() => setCategory(c)}
+              className={cn(
+                "block w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent",
+                category === c && "bg-accent font-semibold",
+              )}
+            >{c}</button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-3 font-display text-sm font-bold uppercase tracking-wider">Business Solutions</h3>
+        <div className="space-y-1">
+          {SOLUTION_CATEGORIES.map(c => (
             <button
               key={c}
               onClick={() => setCategory(c)}
@@ -478,36 +527,35 @@ function SortDropdown({
 function TemplateCard({ t }: { t: Template }) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border bg-card transition-shadow hover:shadow-lg">
-      <Dialog>
-        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          <img
-            src={t.thumbnail}
-            alt={`${t.name} template preview`}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 transition-opacity group-hover:opacity-100" />
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-            <DialogTrigger asChild>
-              <Button size="sm" variant="secondary" className="pointer-events-auto shadow-lg">
-                Live Preview
-              </Button>
-            </DialogTrigger>
-          </div>
-          <div className="absolute left-3 top-3">
-            <Badge className={cn(
-              t.price === 0
-                ? "bg-emerald-500 text-white hover:bg-emerald-500"
-                : "bg-foreground text-background hover:bg-foreground",
-            )}>
-              {t.price === 0 ? "Free" : `$${t.price}`}
-            </Badge>
-          </div>
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+        <img
+          src={t.thumbnail}
+          alt={`${t.name} preview`}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 transition-opacity group-hover:opacity-100" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+          <Link
+            to="/demo/$id"
+            params={{ id: String(t.id) }}
+            target="_blank"
+            rel="noopener"
+            className="pointer-events-auto inline-flex items-center gap-2 rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground shadow-lg hover:bg-secondary/90"
+          >
+            Live Preview <ExternalLink className="h-4 w-4" />
+          </Link>
         </div>
-        <DialogContent className="max-w-4xl overflow-hidden p-0">
-          <img src={t.thumbnail} alt={t.name} className="h-auto w-full" />
-        </DialogContent>
-      </Dialog>
+        <div className="absolute left-3 top-3">
+          <Badge className={cn(
+            t.price === 0
+              ? "bg-emerald-500 text-white hover:bg-emerald-500"
+              : "bg-foreground text-background hover:bg-foreground",
+          )}>
+            {t.price === 0 ? "Free" : `$${t.price}`}
+          </Badge>
+        </div>
+      </div>
 
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-2 flex items-center gap-2">
@@ -527,13 +575,22 @@ function TemplateCard({ t }: { t: Template }) {
         </div>
 
         <div className="mt-4 flex items-center gap-2">
+          <Link
+            to="/demo/$id"
+            params={{ id: String(t.id) }}
+            target="_blank"
+            rel="noopener"
+            className="inline-flex flex-1 items-center justify-center rounded-md border bg-background px-3 py-2 text-sm font-medium hover:bg-accent"
+          >
+            Live Preview
+          </Link>
           {t.price === 0 ? (
             <Button className="flex-1" onClick={() => toast.success(`Downloading ${t.name}...`, { description: "Mock download — no file will be sent." })}>
-              <Download className="mr-2 h-4 w-4" /> Download
+              <Download className="mr-2 h-4 w-4" /> Get
             </Button>
           ) : (
             <Button className="flex-1" onClick={() => toast("Checkout coming soon", { description: `${t.name} · $${t.price}` })}>
-              Buy Now — ${t.price}
+              Buy — ${t.price}
             </Button>
           )}
         </div>
@@ -578,16 +635,13 @@ function Footer() {
               <span className="font-display text-lg font-bold">WebMarket</span>
             </div>
             <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-              A curated marketplace of production-ready website templates for makers and teams.
+              Modern websites and digital solutions for businesses of all sizes.
             </p>
-            <Button className="mt-5" onClick={() => toast("Author onboarding coming soon")}>
-              Sell your template
-            </Button>
           </div>
           <div>
             <h4 className="font-display text-sm font-bold uppercase tracking-wider">Company</h4>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground">About</a></li>
+              <li><Link to="/about" className="hover:text-foreground">About</Link></li>
               <li><a href="#" className="hover:text-foreground">Contact</a></li>
               <li><a href="#" className="hover:text-foreground">Terms</a></li>
               <li><a href="#" className="hover:text-foreground">Privacy</a></li>

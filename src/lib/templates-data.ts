@@ -1,84 +1,153 @@
+export type Kind = "website" | "solution";
+
 export type Template = {
   id: number;
   name: string;
   description: string;
   thumbnail: string;
   price: number; // 0 = free
-  framework: "Bootstrap" | "Tailwind" | "Next.js" | "React" | "Vue";
-  category: "eCommerce" | "Portfolio" | "Landing Page" | "Admin Dashboard" | "Restaurant";
+  kind: Kind;
+  category: string;
   downloads: number;
   rating: number;
   createdAt: string;
+  accent: string; // tailwind color class base, e.g. "emerald"
 };
 
-// Category-appropriate real imagery from Unsplash
-const IMAGES: Record<string, string[]> = {
-  eCommerce: [
-    "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&q=80",
-    "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&q=80",
-    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80",
-    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80",
-    "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80",
-  ],
-  Portfolio: [
-    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",
-    "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80",
-    "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80",
-    "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80",
-    "https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=1200&q=80",
-  ],
-  "Landing Page": [
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
-    "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80",
-    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
-    "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&q=80",
-  ],
-  "Admin Dashboard": [
-    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
-    "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&q=80",
-    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80",
-    "https://images.unsplash.com/photo-1543286386-713bdd548da4?w=1200&q=80",
-  ],
-  Restaurant: [
-    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80",
-    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80",
-    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80",
-    "https://images.unsplash.com/photo-1533777324565-a040eb52facd?w=1200&q=80",
-    "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=1200&q=80",
-  ],
-};
-const pickCounter: Record<string, number> = {};
-const img = (category: keyof typeof IMAGES) => {
-  const list = IMAGES[category];
-  const i = (pickCounter[category] ?? 0) % list.length;
-  pickCounter[category] = i + 1;
-  return list[i];
+export const WEBSITE_CATEGORIES = [
+  "Business Website",
+  "eCommerce",
+  "Restaurant",
+  "Hotel",
+  "School",
+  "Hospital",
+  "Travel Agency",
+  "Real Estate",
+  "Portfolio",
+] as const;
+
+export const SOLUTION_CATEGORIES = [
+  "POS System",
+  "Inventory System",
+  "Attendance System",
+  "School Management System",
+  "Hospital Management System",
+  "Booking System",
+  "CRM",
+  "ERP",
+] as const;
+
+export const ALL_CATEGORIES = [...WEBSITE_CATEGORIES, ...SOLUTION_CATEGORIES] as const;
+
+const IMAGES: Record<string, string> = {
+  "Business Website": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80",
+  "eCommerce": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&q=80",
+  "Restaurant": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80",
+  "Hotel": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80",
+  "School": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=80",
+  "Hospital": "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=1200&q=80",
+  "Travel Agency": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80",
+  "Real Estate": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80",
+  "Portfolio": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",
+  "POS System": "https://images.unsplash.com/photo-1556742212-5b321f3c261b?w=1200&q=80",
+  "Inventory System": "https://images.unsplash.com/photo-1553413077-190dd305871c?w=1200&q=80",
+  "Attendance System": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80",
+  "School Management System": "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&q=80",
+  "Hospital Management System": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&q=80",
+  "Booking System": "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=1200&q=80",
+  "CRM": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80",
+  "ERP": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
 };
 
-export const TEMPLATES: Template[] = [
-  { id: 1, name: "Nova Commerce", description: "Modern storefront with cart & checkout flow.", thumbnail: img("eCommerce"), price: 39, framework: "Next.js", category: "eCommerce", downloads: 12480, rating: 4.8, createdAt: "2026-06-14" },
-  { id: 2, name: "Prism Portfolio", description: "Elegant portfolio for designers and studios.", thumbnail: img("Portfolio"), price: 0, framework: "React", category: "Portfolio", downloads: 8342, rating: 4.6, createdAt: "2026-05-02" },
-  { id: 3, name: "Orbit Admin", description: "Full-featured dashboard with charts & tables.", thumbnail: img("Admin Dashboard"), price: 59, framework: "Tailwind", category: "Admin Dashboard", downloads: 21390, rating: 4.9, createdAt: "2026-04-21" },
-  { id: 4, name: "Bistro Bloom", description: "Warm restaurant site with reservations.", thumbnail: img("Restaurant"), price: 29, framework: "Vue", category: "Restaurant", downloads: 4210, rating: 4.4, createdAt: "2026-03-11" },
-  { id: 5, name: "Pulse Landing", description: "High-converting SaaS landing page.", thumbnail: img("Landing Page"), price: 0, framework: "Tailwind", category: "Landing Page", downloads: 15320, rating: 4.7, createdAt: "2026-07-01" },
-  { id: 6, name: "Atlas Store", description: "Multi-vendor marketplace boilerplate.", thumbnail: img("eCommerce"), price: 49, framework: "Next.js", category: "eCommerce", downloads: 6720, rating: 4.5, createdAt: "2026-02-19" },
-  { id: 7, name: "Ink Folio", description: "Editorial portfolio with case studies.", thumbnail: img("Portfolio"), price: 25, framework: "React", category: "Portfolio", downloads: 3110, rating: 4.3, createdAt: "2026-01-08" },
-  { id: 8, name: "Quartz Dash", description: "Analytics dashboard with dark mode.", thumbnail: img("Admin Dashboard"), price: 0, framework: "React", category: "Admin Dashboard", downloads: 9820, rating: 4.6, createdAt: "2026-06-30" },
-  { id: 9, name: "Saffron Table", description: "Fine dining site with menu highlights.", thumbnail: img("Restaurant"), price: 35, framework: "Bootstrap", category: "Restaurant", downloads: 2140, rating: 4.2, createdAt: "2025-12-14" },
-  { id: 10, name: "Lift Landing", description: "Bold hero-first marketing page.", thumbnail: img("Landing Page"), price: 19, framework: "Next.js", category: "Landing Page", downloads: 11250, rating: 4.7, createdAt: "2026-05-24" },
-  { id: 11, name: "Vela Shop", description: "Minimal fashion boutique template.", thumbnail: img("eCommerce"), price: 45, framework: "Vue", category: "eCommerce", downloads: 5480, rating: 4.5, createdAt: "2026-04-03" },
-  { id: 12, name: "Studio Mono", description: "Monochrome portfolio with grid gallery.", thumbnail: img("Portfolio"), price: 0, framework: "Tailwind", category: "Portfolio", downloads: 7890, rating: 4.6, createdAt: "2026-06-11" },
-  { id: 13, name: "Metric Ops", description: "Ops-focused admin with real-time widgets.", thumbnail: img("Admin Dashboard"), price: 65, framework: "Next.js", category: "Admin Dashboard", downloads: 4820, rating: 4.4, createdAt: "2026-03-27" },
-  { id: 14, name: "Harvest Kitchen", description: "Farm-to-table restaurant template.", thumbnail: img("Restaurant"), price: 0, framework: "React", category: "Restaurant", downloads: 3320, rating: 4.5, createdAt: "2026-02-05" },
-  { id: 15, name: "Rocket Launch", description: "Product launch page with waitlist.", thumbnail: img("Landing Page"), price: 15, framework: "Tailwind", category: "Landing Page", downloads: 18920, rating: 4.8, createdAt: "2026-07-05" },
-  { id: 16, name: "Kite Market", description: "Digital goods marketplace template.", thumbnail: img("eCommerce"), price: 55, framework: "React", category: "eCommerce", downloads: 3980, rating: 4.3, createdAt: "2026-01-30" },
-  { id: 17, name: "Canvas Folio", description: "Photography-first portfolio.", thumbnail: img("Portfolio"), price: 30, framework: "Vue", category: "Portfolio", downloads: 2670, rating: 4.4, createdAt: "2025-11-22" },
-  { id: 18, name: "Beacon Admin", description: "Lightweight admin panel starter.", thumbnail: img("Admin Dashboard"), price: 0, framework: "Bootstrap", category: "Admin Dashboard", downloads: 14210, rating: 4.5, createdAt: "2026-05-16" },
-  { id: 19, name: "Ember Grill", description: "Steakhouse & bar site template.", thumbnail: img("Restaurant"), price: 27, framework: "Tailwind", category: "Restaurant", downloads: 1980, rating: 4.2, createdAt: "2025-10-09" },
-  { id: 20, name: "Signal Landing", description: "Startup landing with pricing tiers.", thumbnail: img("Landing Page"), price: 22, framework: "Next.js", category: "Landing Page", downloads: 8760, rating: 4.6, createdAt: "2026-04-18" },
-  { id: 21, name: "Marble Store", description: "Luxury goods eCommerce theme.", thumbnail: img("eCommerce"), price: 69, framework: "Next.js", category: "eCommerce", downloads: 2340, rating: 4.7, createdAt: "2026-06-25" },
-  { id: 22, name: "Draft Folio", description: "Writer & journalist portfolio.", thumbnail: img("Portfolio"), price: 0, framework: "React", category: "Portfolio", downloads: 5120, rating: 4.4, createdAt: "2026-03-02" },
-  { id: 23, name: "Console Admin", description: "Developer console UI kit.", thumbnail: img("Admin Dashboard"), price: 42, framework: "Tailwind", category: "Admin Dashboard", downloads: 7640, rating: 4.5, createdAt: "2026-05-09" },
-  { id: 24, name: "Basil & Co", description: "Cozy cafe with online ordering.", thumbnail: img("Restaurant"), price: 0, framework: "Vue", category: "Restaurant", downloads: 6210, rating: 4.6, createdAt: "2026-06-18" },
-];
+const ACCENTS: Record<string, string> = {
+  "Business Website": "blue",
+  "eCommerce": "emerald",
+  "Restaurant": "amber",
+  "Hotel": "rose",
+  "School": "indigo",
+  "Hospital": "sky",
+  "Travel Agency": "teal",
+  "Real Estate": "orange",
+  "Portfolio": "violet",
+  "POS System": "emerald",
+  "Inventory System": "blue",
+  "Attendance System": "indigo",
+  "School Management System": "violet",
+  "Hospital Management System": "sky",
+  "Booking System": "rose",
+  "CRM": "amber",
+  "ERP": "teal",
+};
+
+type Seed = { name: string; description: string; price: number; downloads: number; rating: number; createdAt: string };
+
+const websiteSeeds: Record<string, Seed[]> = {
+  "Business Website": [
+    { name: "Aster Consulting", description: "Modern corporate site with services, team, and case studies.", price: 39, downloads: 8420, rating: 4.8, createdAt: "2026-06-14" },
+    { name: "Northline Agency", description: "Bold agency site with animated hero and portfolio grid.", price: 0, downloads: 12310, rating: 4.7, createdAt: "2026-05-02" },
+  ],
+  "eCommerce": [
+    { name: "Nova Store", description: "Modern online storefront with cart and checkout flow.", price: 49, downloads: 15200, rating: 4.9, createdAt: "2026-06-01" },
+    { name: "Vela Boutique", description: "Minimal fashion boutique with product filters.", price: 0, downloads: 9820, rating: 4.6, createdAt: "2026-04-11" },
+  ],
+  "Restaurant": [
+    { name: "Bistro Bloom", description: "Warm restaurant site with menu and reservations.", price: 29, downloads: 6420, rating: 4.7, createdAt: "2026-05-24" },
+    { name: "Saffron Table", description: "Fine dining site with chef highlights.", price: 0, downloads: 4210, rating: 4.5, createdAt: "2026-03-11" },
+  ],
+  "Hotel": [
+    { name: "Azure Bay Resort", description: "Luxury hotel site with room booking.", price: 59, downloads: 5320, rating: 4.8, createdAt: "2026-06-18" },
+    { name: "Urban Stay", description: "City boutique hotel with availability search.", price: 0, downloads: 7120, rating: 4.6, createdAt: "2026-05-06" },
+  ],
+  "School": [
+    { name: "Brightpath Academy", description: "K-12 school site with programs and admissions.", price: 35, downloads: 3420, rating: 4.5, createdAt: "2026-04-21" },
+    { name: "Learnhub College", description: "College site with courses and events.", price: 0, downloads: 5680, rating: 4.6, createdAt: "2026-03-28" },
+  ],
+  "Hospital": [
+    { name: "Meridian Health", description: "Hospital site with departments and doctor booking.", price: 45, downloads: 2820, rating: 4.7, createdAt: "2026-05-30" },
+    { name: "CityCare Clinic", description: "Clinic site with services and appointment form.", price: 0, downloads: 4110, rating: 4.5, createdAt: "2026-04-15" },
+  ],
+  "Travel Agency": [
+    { name: "Wander Trails", description: "Travel agency with tour packages and inquiry.", price: 39, downloads: 4520, rating: 4.7, createdAt: "2026-06-08" },
+    { name: "Voyage Co.", description: "Adventure travel site with destinations.", price: 0, downloads: 6320, rating: 4.6, createdAt: "2026-05-17" },
+  ],
+  "Real Estate": [
+    { name: "Haven Realty", description: "Real estate site with property listings and search.", price: 49, downloads: 3820, rating: 4.8, createdAt: "2026-06-22" },
+    { name: "Cornerstone Homes", description: "Home listings with agent contact.", price: 0, downloads: 5220, rating: 4.5, createdAt: "2026-04-30" },
+  ],
+  "Portfolio": [
+    { name: "Prism Portfolio", description: "Elegant portfolio for designers and studios.", price: 0, downloads: 8342, rating: 4.6, createdAt: "2026-05-02" },
+    { name: "Studio Mono", description: "Monochrome portfolio with grid gallery.", price: 25, downloads: 4890, rating: 4.7, createdAt: "2026-06-11" },
+  ],
+};
+
+const solutionSeeds: Record<string, Seed> = {
+  "POS System": { name: "SwiftPOS", description: "Point-of-sale system with cart, discounts, and receipts.", price: 79, downloads: 3120, rating: 4.8, createdAt: "2026-06-14" },
+  "Inventory System": { name: "StockPilot", description: "Track products, stock levels, and suppliers.", price: 69, downloads: 2820, rating: 4.7, createdAt: "2026-05-24" },
+  "Attendance System": { name: "TimeMark", description: "Employee attendance tracking with reports.", price: 49, downloads: 3420, rating: 4.6, createdAt: "2026-04-18" },
+  "School Management System": { name: "EduHub", description: "Students, teachers, classes, and grades in one place.", price: 99, downloads: 1820, rating: 4.8, createdAt: "2026-06-04" },
+  "Hospital Management System": { name: "MediCore", description: "Patients, appointments, doctors, and billing.", price: 129, downloads: 1420, rating: 4.9, createdAt: "2026-05-11" },
+  "Booking System": { name: "BookFlow", description: "Online booking with calendar and confirmations.", price: 59, downloads: 4820, rating: 4.7, createdAt: "2026-06-20" },
+  "CRM": { name: "PulseCRM", description: "Manage leads, deals, and customer pipeline.", price: 89, downloads: 3620, rating: 4.7, createdAt: "2026-05-08" },
+  "ERP": { name: "OrbitERP", description: "Finance, HR, and operations in a unified suite.", price: 149, downloads: 980, rating: 4.6, createdAt: "2026-04-02" },
+};
+
+let nextId = 1;
+const templates: Template[] = [];
+
+for (const cat of WEBSITE_CATEGORIES) {
+  for (const s of websiteSeeds[cat]) {
+    templates.push({
+      id: nextId++, kind: "website", category: cat, thumbnail: IMAGES[cat], accent: ACCENTS[cat],
+      ...s,
+    });
+  }
+}
+for (const cat of SOLUTION_CATEGORIES) {
+  const s = solutionSeeds[cat];
+  templates.push({
+    id: nextId++, kind: "solution", category: cat, thumbnail: IMAGES[cat], accent: ACCENTS[cat],
+    ...s,
+  });
+}
+
+export const TEMPLATES = templates;
