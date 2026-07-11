@@ -320,14 +320,13 @@ function Hero({
         }}
       />
       <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 sm:py-28 lg:px-8">
-        <Badge variant="secondary" className="mb-5">24+ curated templates · updated weekly</Badge>
         <h1 className="font-display text-4xl font-bold tracking-tight sm:text-6xl">
-          Find the perfect template for your next project.
+          Find the perfect website template for your business
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
-          Production-ready coded templates for landing pages, dashboards, storefronts, and more —
-          crafted with React, Next.js, Tailwind, Vue, and Bootstrap.
+          Ready-to-use website templates for landing pages, online stores, dashboards, and more — designed to help your business grow faster.
         </p>
+
 
         <form
           onSubmit={(e) => { e.preventDefault(); onSearch(); }}
