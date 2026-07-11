@@ -268,10 +268,8 @@ function Navbar({
                     ))}
                   </div>
                 </div>
-                <div className="grid gap-2">
-                  <Button variant="outline" onClick={() => toast("Login coming soon")}>Login</Button>
-                  <Button onClick={() => toast("Sign up coming soon")}>Sign up</Button>
-                </div>
+              </div>
+
               </div>
             </SheetContent>
           </Sheet>
